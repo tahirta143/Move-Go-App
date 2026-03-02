@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:country_picker/country_picker.dart';
 
+import '../home_dashboard/home.dart';
+
 class OtpLoginScreen extends StatefulWidget {
   const OtpLoginScreen({super.key});
 
@@ -289,6 +291,7 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         // Handle continue action
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeDashboard()));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,

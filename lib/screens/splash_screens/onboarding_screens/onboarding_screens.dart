@@ -3,12 +3,68 @@ import 'package:flutter/services.dart';
 
 import '../../auth_screen/otp_login_screen.dart';
 
-class OnboardingScreen2 extends StatelessWidget {
-  const OnboardingScreen2({super.key});
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  final List<Map<String, String>> _pages = [
+    {
+      'image': 'assets/customer side/images/onboardings/onboarding.png',
+      'title': 'Viaje com facilidade',
+      'subtitle': 'Táxi rápido e entregas seguras\nna sua cidade',
+    },
+    {
+      'image': 'assets/customer side/images/onboardings/onboarding.png',
+      'title': 'Chegue com segurança',
+      'subtitle': 'Motoristas verificados e rotas\notimizadas para você',
+    },
+    {
+      'image': 'assets/customer side/images/onboardings/onboarding.png',
+      'title': 'Economize seu tempo',
+      'subtitle': 'Solicite seu transporte em\npoucos segundos',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onNextPressed() {
+    if (_currentPage < _pages.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OtpLoginScreen(),
+        ),
+      );
+    }
+  }
+
+  void _onSkipPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OtpLoginScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Restore the status bar (battery, wifi, time) with dark icons.
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -23,15 +79,14 @@ class OnboardingScreen2 extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Top Bar: Pular (Skip) button
+            // Top Bar: Skip button
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: w * 0.05, vertical: h * 0.01),
+              padding: EdgeInsets.symmetric(
+                  horizontal: w * 0.05, vertical: h * 0.01),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // Handle skip action
-                  },
+                  onPressed: _onSkipPressed,
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.grey[600],
                     textStyle: TextStyle(
@@ -44,18 +99,29 @@ class OnboardingScreen2 extends StatelessWidget {
               ),
             ),
 
-            // Main Image
+            // PageView for images
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(w * 0.04), // Rounded corners
-                  child: Image.asset(
-                    'assets/customer side/images/onboardings/onboarding.png',
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _pages.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: w * 0.05),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(w * 0.04),
+                      child: Image.asset(
+                        _pages[index]['image']!,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
 
@@ -75,26 +141,34 @@ class OnboardingScreen2 extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Title
-                  Text(
-                    'Viaje com facilidade',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: w * 0.065,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF15305B), // Dark blue
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      _pages[_currentPage]['title']!,
+                      key: ValueKey(_currentPage),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: w * 0.065,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF15305B),
+                      ),
                     ),
                   ),
                   SizedBox(height: h * 0.015),
 
                   // Subtitle
-                  Text(
-                    'Táxi rápido e entregas seguras\nna sua cidade',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: w * 0.042,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                      height: 1.4,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      _pages[_currentPage]['subtitle']!,
+                      key: ValueKey('sub_$_currentPage'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: w * 0.042,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
                     ),
                   ),
                   SizedBox(height: h * 0.04),
@@ -102,41 +176,29 @@ class OnboardingScreen2 extends StatelessWidget {
                   // Progress Indicator (Dots)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Active indicator
-                      Container(
-                        width: w * 0.06,
-                        height: w * 0.015,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2D66C1),
-                          borderRadius: BorderRadius.circular(w * 0.01),
+                    children: List.generate(_pages.length, (index) {
+                      final bool isActive = index == _currentPage;
+                      return Padding(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: w * 0.0075),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: isActive ? w * 0.06 : w * 0.015,
+                          height: w * 0.015,
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? const Color(0xFF2D66C1)
+                                : const Color(0xFFB5C8E8),
+                            borderRadius:
+                            BorderRadius.circular(w * 0.01),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: w * 0.015),
-                      // Inactive dot 1
-                      Container(
-                        width: w * 0.015,
-                        height: w * 0.015,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB5C8E8),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: w * 0.015),
-                      // Inactive dot 2
-                      Container(
-                        width: w * 0.015,
-                        height: w * 0.015,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB5C8E8),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ],
+                      );
+                    }),
                   ),
                   SizedBox(height: h * 0.05),
 
-                  // Gradient Next Button
+                  // Gradient Next / Get Started Button
                   Container(
                     width: double.infinity,
                     height: h * 0.075,
@@ -156,24 +218,19 @@ class OnboardingScreen2 extends StatelessWidget {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Handle Next action
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const OtpLoginScreen()
-                          ),
-                        );
-                      },
+                      onPressed: _onNextPressed,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(w * 0.025),
+                          borderRadius:
+                          BorderRadius.circular(w * 0.025),
                         ),
                       ),
                       child: Text(
-                        'Próximo',
+                        _currentPage == _pages.length - 1
+                            ? 'Começar'
+                            : 'Próximo',
                         style: TextStyle(
                           fontSize: w * 0.045,
                           fontWeight: FontWeight.w700,
