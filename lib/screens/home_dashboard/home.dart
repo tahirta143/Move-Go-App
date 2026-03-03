@@ -1,9 +1,7 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../profile_screen/profile.dart';
 import 'fare_estimation/fare_estimation.dart';
+// import 'profile_screen.dart'; // adjust path as needed
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({Key? key}) : super(key: key);
@@ -19,21 +17,23 @@ class _HomeDashboardState extends State<HomeDashboard> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final isTablet = MediaQuery.of(context).size.width >= 600;
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
+
+      // ── Hide AppBar on Profile tab ──────────────────────────────
+      appBar: _selectedIndex == 3
+          ? null
+          : AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
-            backgroundImage: AssetImage('assets/customer side/images/home_images/profile.png'),
+            backgroundImage: AssetImage(
+                'assets/customer side/images/home_images/profile.png'),
             radius: 20,
-            onBackgroundImageError: (exception, stackTrace) {
-              // Fallback avatar
-            },
+            onBackgroundImageError: (exception, stackTrace) {},
           ),
         ),
         title: Column(
@@ -59,10 +59,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   ),
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  '👋',
-                  style: TextStyle(fontSize: 16),
-                ),
+                const Text('👋', style: TextStyle(fontSize: 16)),
               ],
             ),
           ],
@@ -70,56 +67,77 @@ class _HomeDashboardState extends State<HomeDashboard> {
         actions: [
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
+            onPressed: () =>
+                _scaffoldKey.currentState?.openEndDrawer(),
           ),
           const SizedBox(width: 8),
         ],
       ),
+
       endDrawer: _buildDrawer(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 16 : 24,
-            vertical: isMobile ? 12 : 16,
+
+      // ── IndexedStack keeps all tabs alive ───────────────────────
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          // ── Tab 0: Home ────────────────────────────────────────
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 16 : 24,
+                vertical: isMobile ? 12 : 16,
+              ),
+              child: Column(
+                children: [
+                  _buildWalletCard(context),
+                  SizedBox(height: isMobile ? 20 : 24),
+                  _buildSearchBar(context),
+                  SizedBox(height: isMobile ? 20 : 24),
+                  _buildMapSection(context),
+                  SizedBox(height: isMobile ? 24 : 32),
+                  _buildRecentTripsHeader(),
+                  SizedBox(height: isMobile ? 12 : 16),
+                  _buildRecentTrips(context),
+                  SizedBox(height: isMobile ? 24 : 32),
+                  _buildAeroportoSection(),
+                ],
+              ),
+            ),
           ),
-          child: Column(
-            children: [
-              // Wallet Balance Card
-              _buildWalletCard(context),
-              SizedBox(height: isMobile ? 20 : 24),
 
-              // Search Bar
-              _buildSearchBar(context),
-              SizedBox(height: isMobile ? 20 : 24),
-
-              // Map Section
-              _buildMapSection(context),
-              SizedBox(height: isMobile ? 24 : 32),
-
-              // Recent Trips Section
-              _buildRecentTripsHeader(),
-              SizedBox(height: isMobile ? 12 : 16),
-              _buildRecentTrips(context),
-
-              SizedBox(height: isMobile ? 24 : 32),
-
-              // Aeroporto Section
-              _buildAeroportoSection(),
-            ],
+          // ── Tab 1: Viagens ─────────────────────────────────────
+          const Center(
+            child: Text(
+              'Viagens',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
+
+          // ── Tab 2: Encomendas ──────────────────────────────────
+          const Center(
+            child: Text(
+              'Encomendas',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          // ── Tab 3: Perfil ──────────────────────────────────────
+          const ProfileScreen(),
+        ],
       ),
+
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
+  // ── Wallet Card ───────────────────────────────────────────────────
   Widget _buildWalletCard(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Color(0xFF1E5BA8), Color(0xFF2E7AC4)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -144,7 +162,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '15.400,00 AOA',
                     style: TextStyle(
@@ -160,9 +178,12 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   border: Border.all(color: Colors.white30, width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.all(8),
-                child: Icon(Icons.account_balance_wallet,
-                    color: Colors.white, size: isMobile ? 24 : 28),
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  Icons.account_balance_wallet,
+                  color: Colors.white,
+                  size: isMobile ? 24 : 28,
+                ),
               ),
             ],
           ),
@@ -171,12 +192,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {},
-              icon: Icon(Icons.add),
-              label: Text('Carregar'),
+              icon: const Icon(Icons.add),
+              label: const Text('Carregar'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Color(0xFF1E5BA8),
-                padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 14),
+                foregroundColor: const Color(0xFF1E5BA8),
+                padding: EdgeInsets.symmetric(
+                    vertical: isMobile ? 12 : 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -188,15 +210,16 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  // ── Search Bar ────────────────────────────────────────────────────
   Widget _buildSearchBar(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFF5F5F5),
+        color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(12),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: TextField(
         decoration: InputDecoration(
           hintText: 'Para onde vamos?',
@@ -206,12 +229,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
           ),
           border: InputBorder.none,
           icon: Icon(Icons.location_on_outlined, color: Colors.grey[400]),
-          contentPadding: EdgeInsets.symmetric(vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
   }
 
+  // ── Map Section ───────────────────────────────────────────────────
   Widget _buildMapSection(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -220,14 +244,12 @@ class _HomeDashboardState extends State<HomeDashboard> {
       height: isMobile ? 200 : 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(
-          image: AssetImage('assets/customer side/images/home_images/map.png'),
-          fit: BoxFit.cover,
-          onError: (exception, stackTrace) {
-            // Fallback color
-          },
-        ),
         color: Colors.blue[100],
+        image: const DecorationImage(
+          image: AssetImage(
+              'assets/customer side/images/home_images/map.png'),
+          fit: BoxFit.cover,
+        ),
       ),
       child: Stack(
         children: [
@@ -238,7 +260,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(6),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 8,
@@ -246,9 +268,10 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   ),
                 ],
               ),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Row(
-                children: [
+                children: const [
                   Icon(Icons.location_on, color: Colors.blue, size: 14),
                   SizedBox(width: 6),
                   Text(
@@ -268,11 +291,12 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  // ── Recent Trips Header ───────────────────────────────────────────
   Widget _buildRecentTripsHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+        const Text(
           'Viagens Recentes',
           style: TextStyle(
             fontSize: 16,
@@ -282,7 +306,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
         ),
         TextButton(
           onPressed: () {},
-          child: Text(
+          child: const Text(
             'Ver tudo',
             style: TextStyle(
               color: Color(0xFF1E5BA8),
@@ -295,6 +319,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  // ── Recent Trips ──────────────────────────────────────────────────
   Widget _buildRecentTrips(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -302,7 +327,6 @@ class _HomeDashboardState extends State<HomeDashboard> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          // Replace the first _buildTripCard call with this:
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -316,32 +340,38 @@ class _HomeDashboardState extends State<HomeDashboard> {
               title: 'Pedir Táxi',
               subtitle: 'Viagens rápidas e seguras',
               icon: Icons.local_taxi,
-              color: Color(0xFF1E5BA8),
-              imageAsset: 'assets/customer side/images/home_images/car.png',
+              color: const Color(0xFF1E5BA8),
+              imageAsset:
+              'assets/customer side/images/home_images/car.png',
               width: isMobile ? 160 : 200,
               hasImage: true,
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           _buildTripCard(
             title: 'Enviar',
             subtitle: 'Encomendar Entrega porta-a-porta',
             icon: Icons.local_shipping,
-            color: Color(0xFF5B7A9C),
-              imageAsset: 'assets/customer side/images/home_images/delivery_boy.png',
-              width: isMobile ? 160 : 200,
-              hasImage: true
+            color: const Color(0xFF5B7A9C),
+            imageAsset:
+            'assets/customer side/images/home_images/delivery_boy.png',
+            width: isMobile ? 160 : 200,
+            hasImage: true,
           ),
         ],
       ),
     );
   }
 
+  // ── Trip Card ─────────────────────────────────────────────────────
   Widget _buildTripCard({
     required String title,
     required String subtitle,
     required String imageAsset,
-    required double width, required Color color, required IconData icon, required bool hasImage,
+    required double width,
+    required Color color,
+    required IconData icon,
+    required bool hasImage,
   }) {
     return Container(
       width: width,
@@ -361,19 +391,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // ── Background image fills entire card ──
-            Image.asset(
-              imageAsset,
-              fit: BoxFit.cover,
-            ),
-
-            // ── Dark gradient overlay — transparent top, deep navy bottom ──
+            Image.asset(imageAsset, fit: BoxFit.cover),
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0x00000000), // fully transparent at top
-                    Color(0xCC0A1A3A), // deep navy at bottom
+                    Color(0x00000000),
+                    Color(0xCC0A1A3A),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -381,8 +405,6 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 ),
               ),
             ),
-
-            // ── Text pinned to bottom-left ──
             Positioned(
               left: 12,
               right: 12,
@@ -404,7 +426,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      color: Color(0xFFB0C4DE), // soft blue-white
+                      color: Color(0xFFB0C4DE),
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
                       height: 1.3,
@@ -420,6 +442,8 @@ class _HomeDashboardState extends State<HomeDashboard> {
       ),
     );
   }
+
+  // ── Aeroporto Section ─────────────────────────────────────────────
   Widget _buildAeroportoSection() {
     return Container(
       width: double.infinity,
@@ -427,27 +451,27 @@ class _HomeDashboardState extends State<HomeDashboard> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: Row(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Color(0xFFF5F5F5),
             ),
-            padding: EdgeInsets.all(8),
-            child: Icon(
+            padding: const EdgeInsets.all(8),
+            child: const Icon(
               Icons.schedule,
               color: Color(0xFF1E5BA8),
               size: 24,
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Aeroporto de Luanda',
                   style: TextStyle(
                     fontSize: 14,
@@ -455,7 +479,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Ontem, 14:20 · AOA 4.500',
                   style: TextStyle(
@@ -471,6 +495,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  // ── Bottom Nav Bar ────────────────────────────────────────────────
   Widget _buildBottomNavBar() {
     return Container(
       decoration: BoxDecoration(
@@ -479,7 +504,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -492,9 +517,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
         },
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Color(0xFF1E5BA8),
+        selectedItemColor: const Color(0xFF1E5BA8),
         unselectedItemColor: Colors.grey[400],
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
@@ -516,13 +541,14 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  // ── Drawer ────────────────────────────────────────────────────────
   Widget _buildDrawer() {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF1E5BA8), Color(0xFF2E7AC4)],
                 begin: Alignment.topLeft,
@@ -534,14 +560,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage('assets/customer side/images/home_images/profile.png'),
+                  backgroundImage: const AssetImage(
+                      'assets/customer side/images/home_images/profile.png'),
                   radius: 30,
-                  onBackgroundImageError: (exception, stackTrace) {
-                    // Fallback
-                  },
+                  onBackgroundImageError: (exception, stackTrace) {},
                 ),
-                SizedBox(height: 12),
-                Text(
+                const SizedBox(height: 12),
+                const Text(
                   'João Silva',
                   style: TextStyle(
                     color: Colors.white,
@@ -549,50 +574,53 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
+                const Text(
                   '+244 923 456 789',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
           ),
           ListTile(
-            leading: Icon(Icons.account_circle, color: Color(0xFF1E5BA8)),
-            title: Text('Meu Perfil'),
+            leading:
+            const Icon(Icons.account_circle, color: Color(0xFF1E5BA8)),
+            title: const Text('Meu Perfil'),
+            onTap: () {
+              Navigator.pop(context);
+              setState(() => _selectedIndex = 3); // go to Profile tab
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.payment, color: Color(0xFF1E5BA8)),
+            title: const Text('Minha Carteira'),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: Icon(Icons.payment, color: Color(0xFF1E5BA8)),
-            title: Text('Minha Carteira'),
+            leading: const Icon(Icons.history, color: Color(0xFF1E5BA8)),
+            title: const Text('Histórico de Viagens'),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: Icon(Icons.history, color: Color(0xFF1E5BA8)),
-            title: Text('Histórico de Viagens'),
+            leading: const Icon(Icons.notifications,
+                color: Color(0xFF1E5BA8)),
+            title: const Text('Notificações'),
+            onTap: () => Navigator.pop(context),
+          ),
+          const Divider(),
+          ListTile(
+            leading:
+            const Icon(Icons.settings, color: Color(0xFF1E5BA8)),
+            title: const Text('Configurações'),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: Icon(Icons.notifications, color: Color(0xFF1E5BA8)),
-            title: Text('Notificações'),
-            onTap: () => Navigator.pop(context),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.settings, color: Color(0xFF1E5BA8)),
-            title: Text('Configurações'),
+            leading: const Icon(Icons.help, color: Color(0xFF1E5BA8)),
+            title: const Text('Ajuda e Suporte'),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: Icon(Icons.help, color: Color(0xFF1E5BA8)),
-            title: Text('Ajuda e Suporte'),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout, color: Colors.red),
-            title: Text('Sair'),
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Sair'),
             onTap: () => Navigator.pop(context),
           ),
         ],

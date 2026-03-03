@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../rating_screen/rating_screen.dart';
+
 class LiveRideTrackingScreen extends StatefulWidget {
   const LiveRideTrackingScreen({Key? key}) : super(key: key);
 
@@ -313,7 +315,7 @@ class _LiveRideTrackingScreenState extends State<LiveRideTrackingScreen>
                   'assets/customer side/images/home_images/profile.png',
                 ),
                 onBackgroundImageError: (_, __) {},
-                child: const Icon(Icons.person, color: Colors.grey),
+                // child: const Icon(Icons.person, color: Colors.grey),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -487,7 +489,7 @@ class _LiveRideTrackingScreenState extends State<LiveRideTrackingScreen>
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>RateYourRideScreen()));},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E5BA8),
                     foregroundColor: Colors.white,
