@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:move_go/screens/chat_screen/chat_screen.dart';
+import 'package:move_go/screens/trip_history_screen/trip_history_screen.dart';
+import '../cancel_trip_screen/cancel_screen.dart';
+import '../country_slection/country_slection.dart';
+import '../notification_screen/notification_screen.dart';
+import '../terms_screen/terms_screen.dart';
+// import 'termos_screen.dart'; // 🔁 Replace with your actual import path
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -25,24 +32,27 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: sw * 0.09,
-                      height: sw * 0.09,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.chevron_left,
-                        size: sw * 0.055,
-                        color: Colors.black87,
+                    child: GestureDetector(
+                      onTap: () => Navigator.maybePop(context),
+                      child: Container(
+                        width: sw * 0.09,
+                        height: sw * 0.09,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.07),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.chevron_left,
+                          size: sw * 0.055,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
                   ),
@@ -73,6 +83,7 @@ class ProfileScreen extends StatelessWidget {
                       backgroundColor: const Color(0xFF444444),
                       backgroundImage: const AssetImage(
                         'assets/customer side/images/home_images/profile.png',
+                        // 🔁 Replace with your actual asset path
                       ),
                     ),
 
@@ -128,17 +139,50 @@ class ProfileScreen extends StatelessWidget {
                     _menuCard(
                       sw: sw,
                       sh: sh,
+                      context: context,
                       items: [
-                        _Item(icon: Icons.access_time_outlined,
-                            label: 'Historico de viagens'),
-                        _Item(icon: Icons.account_balance_wallet_outlined,
-                            label: 'Carteira'),
-                        _Item(icon: Icons.translate,
-                            label: 'Idioma',
-                            subtitle: 'Português'),
-                        _Item(icon: Icons.notifications_none_outlined,
-                            label: 'Notificações',
-                            isLast: true),
+                        _Item(
+                          icon: Icons.access_time_outlined,
+                          label: 'Historico de viagens',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const TripHistoryScreen(),
+                            ),
+                          ),
+                        ),
+                        _Item(
+                          icon: Icons.account_balance_wallet_outlined,
+                          label: 'Carteira',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CancelarViagemScreen(),
+                            ),
+                          ),
+                        ),
+                        _Item(
+                          icon: Icons.translate,
+                          label: 'Idioma',
+                          subtitle: 'Português',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CountrySlection(),
+                            ),
+                          ),
+                        ),
+                        _Item(
+                          icon: Icons.notifications_none_outlined,
+                          label: 'Notificações',
+                          isLast: true,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const NotificacoesScreen(),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
 
@@ -148,12 +192,30 @@ class ProfileScreen extends StatelessWidget {
                     _menuCard(
                       sw: sw,
                       sh: sh,
+                      context: context,
                       items: [
-                        _Item(icon: Icons.description_outlined,
-                            label: 'Termos'),
-                        _Item(icon: Icons.chat_bubble_outline,
-                            label: 'Chat support',
-                            isLast: true),
+                        _Item(
+                          icon: Icons.description_outlined,
+                          label: 'Termos',
+                          // ✅ Navigate to TermosScreen on tap
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const TermosScreen(),
+                            ),
+                          ),
+                        ),
+                        _Item(
+                          icon: Icons.chat_bubble_outline,
+                          label: 'Chat support',
+                          isLast: true,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ChatScreen(),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
 
@@ -168,7 +230,9 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(sw * 0.04),
-                        onTap: () {},
+                        onTap: () {
+                          // TODO: Handle logout
+                        },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: sw * 0.05,
@@ -217,6 +281,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _menuCard({
     required double sw,
     required double sh,
+    required BuildContext context,
     required List<_Item> items,
   }) {
     return Container(
@@ -231,14 +296,12 @@ class ProfileScreen extends StatelessWidget {
           return Column(
             children: [
               InkWell(
-                onTap: () {},
+                onTap: item.onTap ?? () {},
                 borderRadius: BorderRadius.only(
-                  topLeft: i == 0
-                      ? Radius.circular(sw * 0.04)
-                      : Radius.zero,
-                  topRight: i == 0
-                      ? Radius.circular(sw * 0.04)
-                      : Radius.zero,
+                  topLeft:
+                  i == 0 ? Radius.circular(sw * 0.04) : Radius.zero,
+                  topRight:
+                  i == 0 ? Radius.circular(sw * 0.04) : Radius.zero,
                   bottomLeft: item.isLast
                       ? Radius.circular(sw * 0.04)
                       : Radius.zero,
@@ -321,10 +384,13 @@ class _Item {
   final String label;
   final String? subtitle;
   final bool isLast;
+  final VoidCallback? onTap;
+
   const _Item({
     required this.icon,
     required this.label,
     this.subtitle,
     this.isLast = false,
+    this.onTap,
   });
 }

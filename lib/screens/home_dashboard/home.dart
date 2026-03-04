@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../profile_screen/profile.dart';
+import '../success_payment_screen/success_payment.dart';
 import 'fare_estimation/fare_estimation.dart';
 // import 'profile_screen.dart'; // adjust path as needed
 
@@ -348,16 +349,28 @@ class _HomeDashboardState extends State<HomeDashboard> {
             ),
           ),
           const SizedBox(width: 12),
-          _buildTripCard(
-            title: 'Enviar',
-            subtitle: 'Encomendar Entrega porta-a-porta',
-            icon: Icons.local_shipping,
-            color: const Color(0xFF5B7A9C),
-            imageAsset:
-            'assets/customer side/images/home_images/delivery_boy.png',
-            width: isMobile ? 160 : 200,
-            hasImage: true,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PaymentSuccessScreen(),
+                ),
+              );
+            },
+            child: _buildTripCard(
+              title: 'Enviar',
+              subtitle: 'Encomendar Entrega porta-a-porta',
+              icon: Icons.local_shipping,
+              color: const Color(0xFF5B7A9C),
+              imageAsset:
+              'assets/customer side/images/home_images/delivery_boy.png',
+              width: isMobile ? 160 : 200,
+              hasImage: true,
+            ),
           ),
+
+
         ],
       ),
     );

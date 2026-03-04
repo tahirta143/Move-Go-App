@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../chat_screen/chat_screen.dart';
+
 class DriverMatchingScreen extends StatefulWidget {
   const DriverMatchingScreen({super.key});
 
@@ -427,7 +429,8 @@ class _DriverMatchingScreenState extends State<DriverMatchingScreen>
                       borderRadius: BorderRadius.circular(sw * 0.034),
                     ),
                     child: ElevatedButton(
-                      onPressed: () => Navigator.maybePop(context),
+                      onPressed: () =>
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ChatScreen())),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
