@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:move_go/screens/splash_screens/splash/splash.dart';
 
+import '../../auth_screen/rigester_screen/rigister_screen.dart';
+
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -243,6 +245,7 @@ class _BottomButtonsSection extends StatelessWidget {
             child: OutlinedButton(
               onPressed: () {
                 // Navigate to login screen
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>RegisterScreen()));
               },
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.transparent,
