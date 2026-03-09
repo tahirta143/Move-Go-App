@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:move_go/screens/splash_screens/onboarding_1/onboarding_1.dart';
+
+
+import 'custommer_app/screens/splash_screens/onboarding_1/onboarding_1.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
